@@ -11,39 +11,39 @@ mruby binding of [facebook/rocksdb](https://github.com/facebook/rocksdb)
 |:------------|--------------------|
 | []          | :heavy_check_mark: |
 | []=         | :heavy_check_mark: |
-| clear       |  |
+| clear       | :heavy_check_mark: |
 | close       | :heavy_check_mark: |
 | closed?     | :heavy_check_mark: |
 | delete      | :heavy_check_mark: |
-| delete_if   |  |
-| reject!     |  |
-| each        |  |
-| each_pair   |  |
-| each_key    |  |
-| each_value  |  |
-| empty?      |  |
-| fetch       |  |
-| has_key?    |  |
-| include?    |  |
-| key?        |  |
-| member?     |  |
-| has_value?  |  |
-| value?      |  |
-| invert      |  |
-| key         |  |
-| keys        |  |
-| length      |  |
-| size        |  |
-| reject      |  |
+| delete_if   | :heavy_check_mark: |
+| reject!     | :heavy_check_mark: |
+| each        | :heavy_check_mark: |
+| each_pair   | :heavy_check_mark: |
+| each_key    | :heavy_check_mark: |
+| each_value  | :heavy_check_mark: |
+| empty?      | :heavy_check_mark: |
+| fetch       | :heavy_check_mark: |
+| has_key?    | :heavy_check_mark: |
+| include?    | :heavy_check_mark: |
+| key?        | :heavy_check_mark: |
+| member?     | :heavy_check_mark: |
+| has_value?  | :heavy_check_mark: |
+| value?      | :heavy_check_mark: |
+| invert      | :heavy_check_mark: |
+| key         | :heavy_check_mark: |
+| keys        | :heavy_check_mark: |
+| length      | :heavy_check_mark: |
+| size        | :heavy_check_mark: |
+| reject      | :heavy_check_mark: |
 | replace     |  |
-| select      |  |
-| shift       |  |
-| store       |  |
-| to_a        |  |
-| to_hash     |  |
+| select      | :heavy_check_mark: |
+| shift       | :heavy_check_mark: |
+| store       | :heavy_check_mark: |
+| to_a        | :heavy_check_mark: |
+| to_hash     | :heavy_check_mark: |
 | update      |  |
-| values      |  |
-| values_at   |  |
+| values      | :heavy_check_mark: |
+| values_at   | :heavy_check_mark: |
 
 
 # License
