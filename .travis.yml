@@ -16,8 +16,8 @@ before_script:
   - git clone --depth 1 https://github.com/facebook/rocksdb.git
   - cd rocksdb/
   - make shared_lib
-  - cp ./librocksdb.* /usr/lib/
-  - cp -r ./include/rocksdb/ /usr/include/
+  - sudo cp ./librocksdb.* /usr/lib/
+  - sudo cp -r ./include/rocksdb/ /usr/include/
   - cd ../
 script:
   - echo '-------------------------------'
