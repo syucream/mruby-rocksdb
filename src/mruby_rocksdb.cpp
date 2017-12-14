@@ -10,13 +10,18 @@
 
 #include "rocksdb/db.h"
 
-#define CLASSNAME "RocksDB"
-#define ROCKSDB_HANDLER_EXCEPTION "RocksDBHandlerError"
-#define E_ROCKSDB_ERROR (mrb_class_get_under(mrb, mrb_class_get(mrb, CLASSNAME), ROCKSDB_HANDLER_EXCEPTION))
+using namespace std;
 
 const int PAIR_ARGC = 2;
+const static char* CLASSNAME = "RocksDB";
+const static char* ROCKSDB_HANDLER_EXCEPTION = "RocksDBHandlerError";
 
-using namespace std;
+static inline struct RClass*
+_rocksdb_error(mrb_state* mrb)
+{
+  auto klass = mrb_class_get(mrb, CLASSNAME);
+  return mrb_class_get_under(mrb, klass, ROCKSDB_HANDLER_EXCEPTION);
+}
 
 static inline rocksdb::DB*
 _rocksdb_get_handler(mrb_state* mrb, mrb_value self)
@@ -24,7 +29,7 @@ _rocksdb_get_handler(mrb_state* mrb, mrb_value self)
   auto handler = reinterpret_cast<rocksdb::DB*>DATA_PTR(self);
 
   if (handler == nullptr) {
-    mrb_raise(mrb, E_ROCKSDB_ERROR, "rocksdb is closed");
+    mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb is closed");
   }
 
   return handler;
@@ -59,7 +64,7 @@ mrb_rocksdb_open(mrb_state *mrb, mrb_value self)
   auto status = rocksdb::DB::Open(options, path, &handler);
 
   if (!status.ok()) {
-    mrb_raise(mrb, E_ROCKSDB_ERROR, "rocksdb open failed");
+    mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb open failed");
   }
 
   DATA_TYPE(self) = &RocksDB_type;
@@ -91,7 +96,7 @@ mrb_rocksdb_set(mrb_state *mrb, mrb_value self)
 
   const auto status = handler->Put(rocksdb::WriteOptions(), key, value);
   if (!status.ok()) {
-    mrb_raise(mrb, E_ROCKSDB_ERROR, "rocksdb set is failed");
+    mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb set is failed");
   }
 
   return mrb_nil_value();
@@ -107,7 +112,7 @@ mrb_rocksdb_delete(mrb_state *mrb, mrb_value self)
 
   const auto status = handler->Delete(rocksdb::WriteOptions(), key);
   if (!status.ok()) {
-    mrb_raise(mrb, E_ROCKSDB_ERROR, "rocksdb delete is failed");
+    mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb delete is failed");
   }
 
   return mrb_nil_value();
@@ -120,12 +125,12 @@ mrb_rocksdb_each(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "&", &block);
 
   auto handler = _rocksdb_get_handler(mrb, self);
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
-  for (; iter->Valid(); iter->Next()) {
-    auto k = iter->key();
-    auto v = iter->value();
+  for (; (*iter)->Valid(); (*iter)->Next()) {
+    const auto k = (*iter)->key();
+    const auto v = (*iter)->value();
 
     mrb_value key = mrb_str_new(mrb, k.data(), k.size());
     mrb_value val = mrb_str_new(mrb, v.data(), v.size());
@@ -143,11 +148,11 @@ mrb_rocksdb_each_key(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "&", &block);
 
   auto handler = _rocksdb_get_handler(mrb, self);
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
-  for (; iter->Valid(); iter->Next()) {
-    auto k = iter->key();
+  for (; (*iter)->Valid(); (*iter)->Next()) {
+    const auto k = (*iter)->key();
 
     mrb_value key = mrb_str_new(mrb, k.data(), k.size());
     mrb_yield(mrb, block, key);
@@ -163,11 +168,11 @@ mrb_rocksdb_each_value(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "&", &block);
 
   auto handler = _rocksdb_get_handler(mrb, self);
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
-  for (; iter->Valid(); iter->Next()) {
-    auto v = iter->value();
+  for (; (*iter)->Valid(); (*iter)->Next()) {
+    const auto v = (*iter)->value();
 
     mrb_value value = mrb_str_new(mrb, v.data(), v.size());
     mrb_yield(mrb, block, value);
@@ -179,7 +184,7 @@ mrb_rocksdb_each_value(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_rocksdb_has_key_q(mrb_state *mrb, mrb_value self)
 {
-  auto has_key = !mrb_nil_p(mrb_rocksdb_get(mrb, self));
+  const auto has_key = !mrb_nil_p(mrb_rocksdb_get(mrb, self));
   return has_key ? mrb_true_value() : mrb_false_value();
 }
 
@@ -195,7 +200,7 @@ mrb_rocksdb_close(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_rocksdb_closed_q(mrb_state *mrb, mrb_value self)
 {
-  auto handler = reinterpret_cast<rocksdb::DB*>(DATA_PTR(self));
+  const auto handler = reinterpret_cast<rocksdb::DB*>(DATA_PTR(self));
   return handler == nullptr ? mrb_true_value() : mrb_false_value();
 }
 
@@ -204,14 +209,14 @@ static mrb_value
 mrb_rocksdb_invert(mrb_state *mrb, mrb_value self)
 {
   auto handler = _rocksdb_get_handler(mrb, self);
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
   mrb_value hash = mrb_hash_new(mrb);
 
-  for (; iter->Valid(); iter->Next()) {
-    auto k = iter->key();
-    auto v = iter->value();
+  for (; (*iter)->Valid(); (*iter)->Next()) {
+    const auto k = (*iter)->key();
+    const auto v = (*iter)->value();
 
     mrb_value key = mrb_str_new(mrb, k.data(), k.size());
     mrb_value val = mrb_str_new(mrb, v.data(), v.size());
@@ -225,16 +230,16 @@ static mrb_value
 mrb_rocksdb_shift(mrb_state *mrb, mrb_value self)
 {
   auto handler = _rocksdb_get_handler(mrb, self);
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
   // return nil if empty
-  if (!iter->Valid()) {
+  if (!(*iter)->Valid()) {
     return mrb_nil_value();
   }
 
-  const auto k = iter->key();
-  const auto v = iter->value();
+  const auto k = (*iter)->key();
+  const auto v = (*iter)->value();
   auto key = mrb_str_new(mrb, k.data(), k.size());
   auto val = mrb_str_new(mrb, v.data(), v.size());
 
@@ -244,7 +249,7 @@ mrb_rocksdb_shift(mrb_state *mrb, mrb_value self)
 
   const auto status = handler->Delete(rocksdb::WriteOptions(), k);
   if (!status.ok()) {
-    mrb_raise(mrb, E_ROCKSDB_ERROR, "rocksdb delete is failed");
+    mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb delete is failed");
   }
 
   return array;
@@ -255,11 +260,11 @@ mrb_rocksdb_count(mrb_state *mrb, mrb_value self)
 {
   auto handler = _rocksdb_get_handler(mrb, self);
 
-  auto iter = handler->NewIterator(rocksdb::ReadOptions());
-  iter->SeekToFirst();
+  auto iter = make_shared<rocksdb::Iterator*>(handler->NewIterator(rocksdb::ReadOptions()));
+  (*iter)->SeekToFirst();
 
   mrb_int count = 0;
-  for (; iter->Valid(); iter->Next()) {
+  for (; (*iter)->Valid(); (*iter)->Next()) {
     ++count;
   }
 
@@ -286,9 +291,7 @@ mrb_rocksdb_reject(mrb_state *mrb, mrb_value self)
 void
 mrb_mruby_rocksdb_gem_init(mrb_state* mrb)
 {
-  struct RClass *rclass;
-
-  rclass = mrb_define_class(mrb, CLASSNAME, mrb->object_class);
+  auto rclass = mrb_define_class(mrb, CLASSNAME, mrb->object_class);
 
   mrb_define_method(mrb, rclass, "initialize", mrb_rocksdb_open, MRB_ARGS_REQ(3));
   mrb_define_method(mrb, rclass, "[]", mrb_rocksdb_get, MRB_ARGS_REQ(1));
