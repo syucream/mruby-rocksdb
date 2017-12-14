@@ -26,7 +26,7 @@ _rocksdb_error(mrb_state* mrb)
 static inline rocksdb::DB*
 _rocksdb_get_handler(mrb_state* mrb, mrb_value self)
 {
-  auto handler = reinterpret_cast<rocksdb::DB*>DATA_PTR(self);
+  auto handler = reinterpret_cast<rocksdb::DB*>(DATA_PTR(self));
 
   if (handler == nullptr) {
     mrb_raise(mrb, _rocksdb_error(mrb), "rocksdb is closed");
@@ -68,7 +68,7 @@ mrb_rocksdb_open(mrb_state *mrb, mrb_value self)
   }
 
   DATA_TYPE(self) = &RocksDB_type;
-  DATA_PTR(self) = (void*)handler;
+  DATA_PTR(self) = reinterpret_cast<void*>(handler);
 
   return self;
 }
@@ -320,7 +320,7 @@ mrb_mruby_rocksdb_gem_init(mrb_state* mrb)
   mrb_include_module(mrb, rclass, mrb_module_get(mrb, "Enumerable"));
 
   // Exceptions
-  mrb_define_class(mrb, ROCKSDB_HANDLER_EXCEPTION, rclass);
+  mrb_define_class_under(mrb, rclass, ROCKSDB_HANDLER_EXCEPTION, mrb->eException_class);
 }
 
 void
