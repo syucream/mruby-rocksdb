@@ -10,9 +10,15 @@ install:
   - sudo apt-get -qq install libssl-dev ruby
 before_script:
   - echo '-------------------------------'
-  - echo 'Prepare mruby                  '
+  - echo 'Resolve dependencies           '
   - echo '-------------------------------'
   - git clone --depth 1 https://github.com/mruby/mruby.git
+  - git clone --depth 1 https://github.com/facebook/rocksdb.git
+  - cd rocksdb/
+  - make shared_lib
+  - cp ./librocksdb.* /usr/lib/
+  - cp -r ./include/rocksdb/ /usr/include/
+  - cd ../
 script:
   - echo '-------------------------------'
   - echo 'Run unit test                  '

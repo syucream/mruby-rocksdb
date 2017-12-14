@@ -64,6 +64,27 @@ class RocksDB
     end
   end
 
+  def replace(other)
+    raise ArgumentError, "The argument is not RocksDB object" unless other.is_a? RocksDB
+
+    self.clear
+    other.each_pair do |key, value|
+      self[key] = value
+    end
+
+    self
+  end
+
+  def update(other)
+    raise ArgumentError, "The argument is not RocksDB object" unless other.is_a? RocksDB
+
+    other.each_pair do |key, value|
+      self[key] = value
+    end
+
+    self
+  end
+
   alias length count
   alias size count
   alias value? has_value?
