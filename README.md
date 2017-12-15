@@ -1,5 +1,7 @@
 # mruby-rocksdb
 
+[![Build Status](https://travis-ci.org/syucream/mruby-rocksdb.svg?branch=master)](https://travis-ci.org/syucream/mruby-rocksdb)
+
 mruby binding of [facebook/rocksdb](https://github.com/facebook/rocksdb)
 
 # Implemented methods
@@ -35,13 +37,13 @@ mruby binding of [facebook/rocksdb](https://github.com/facebook/rocksdb)
 | length      | :heavy_check_mark: |
 | size        | :heavy_check_mark: |
 | reject      | :heavy_check_mark: |
-| replace     |  |
+| replace     | :heavy_check_mark: |
 | select      | :heavy_check_mark: |
 | shift       | :heavy_check_mark: |
 | store       | :heavy_check_mark: |
 | to_a        | :heavy_check_mark: |
 | to_hash     | :heavy_check_mark: |
-| update      |  |
+| update      | :heavy_check_mark: |
 | values      | :heavy_check_mark: |
 | values_at   | :heavy_check_mark: |
 
