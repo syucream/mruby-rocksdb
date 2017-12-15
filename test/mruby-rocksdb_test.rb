@@ -1,18 +1,18 @@
-FILENAME = '/tmp/mtest.rocksdb'
-OTHER_FILENAME = '/tmp/mtest_other.rocksdb'
+PREFIX = '/tmp/mtest.rocksdb.'
+OTHER_PREFIX = '/tmp/mtest_other.rocksdb.'
 
 assert 'RocksDB#open' do
-  init = RocksDB.new(FILENAME)
+  init = RocksDB.new(PREFIX + 'open')
   init.store('key1', 'value1')
   init.close
 
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'open')
   assert_equal db.fetch('key1'), 'value1'
   db.close
 end
 
 assert 'RocksDB#clear' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'clear')
   db.store('key1', 'value1')
   db.store('key2', 'value2')
   db.store('key3', 'value3')
@@ -23,14 +23,14 @@ assert 'RocksDB#clear' do
 end
 
 assert 'RocksDB#closed' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'closed')
   db.close
 
   assert_true db.closed?
 end
 
 assert 'RocksDB#delete' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'delete')
   db.clear
   db.store('key1', 'value1')
   db.delete('key1')
@@ -39,7 +39,7 @@ assert 'RocksDB#delete' do
 end
 
 assert 'RocksDB#delete_if' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'delete_if')
   db.clear
 
   db.store('key1', 'value1')
@@ -56,7 +56,7 @@ assert 'RocksDB#delete_if' do
 end
 
 assert 'RocksDB#fetch_store' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'fetch_store')
   db.clear
   db.store('key1', 'value1')
 
@@ -70,7 +70,7 @@ assert 'RocksDB#fetch_store' do
 end
 
 assert 'RocksDB#each' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'each')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -88,7 +88,7 @@ assert 'RocksDB#each' do
 end
 
 assert 'RocksDB#each_key' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'each_key')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -100,7 +100,7 @@ assert 'RocksDB#each_key' do
 end
 
 assert 'RocksDB#each_value' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'each_value')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -112,7 +112,7 @@ assert 'RocksDB#each_value' do
 end
 
 assert 'RocksDB#has_key' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'has_key')
   db.clear
   db.store('key1', 'value1')
 
@@ -130,7 +130,7 @@ assert 'RocksDB#has_key' do
 end
 
 assert 'RocksDB#has_value' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'has_value')
   db.clear
   db.store('key1', 'value1')
 
@@ -144,7 +144,7 @@ assert 'RocksDB#has_value' do
 end
 
 assert 'RocksDB#keys' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'keys')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -157,7 +157,7 @@ assert 'RocksDB#keys' do
 end
 
 assert 'RocksDB#values' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'values')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -170,7 +170,7 @@ assert 'RocksDB#values' do
 end
 
 assert 'RocksDB#invert' do
-  db = RocksDB.new(FILENAME, 0666, RocksDB::NEWDB)
+  db = RocksDB.new(PREFIX + 'invert')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -185,7 +185,7 @@ assert 'RocksDB#invert' do
 end
 
 assert 'RocksDB#values_at' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'values_at')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -198,7 +198,7 @@ assert 'RocksDB#values_at' do
 end
 
 assert 'RocksDB#shift' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'shift')
   db.clear
   db.store('key1', 'value1')
 
@@ -212,7 +212,7 @@ end
 #
 
 assert 'RocksDB#to_a' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'to_a')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -225,7 +225,7 @@ assert 'RocksDB#to_a' do
 end
 
 assert 'RocksDB#to_hash' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'to_hash')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -240,7 +240,7 @@ assert 'RocksDB#to_hash' do
 end
 
 assert 'RocksDB#select' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'select')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
@@ -254,7 +254,7 @@ assert 'RocksDB#select' do
 end
 
 assert 'RocksDB#reject' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'reject')
   db.clear
 
   db.store('key1', 'value1')
@@ -272,13 +272,13 @@ assert 'RocksDB#reject' do
 end
 
 assert 'RocksDB#replace' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'replace')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
   db.store('key3', 'value3')
 
-  other = RocksDB.new(OTHER_FILENAME)
+  other = RocksDB.new(OTHER_PREFIX + 'replace')
   other.clear
   other.store('other_key1', 'other_value1')
   other.store('other_key2', 'other_value2')
@@ -295,13 +295,13 @@ assert 'RocksDB#replace' do
 end
 
 assert 'RocksDB#update' do
-  db = RocksDB.new(FILENAME)
+  db = RocksDB.new(PREFIX + 'update')
   db.clear
   db.store('key1', 'value1')
   db.store('key2', 'value2')
   db.store('key3', 'value3')
 
-  other = RocksDB.new(OTHER_FILENAME)
+  other = RocksDB.new(OTHER_PREFIX + 'update')
   other.clear
   other.store('key1', 'other_value1')
   other.store('other_key2', 'other_value2')

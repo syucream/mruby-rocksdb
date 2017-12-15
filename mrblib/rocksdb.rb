@@ -6,7 +6,7 @@ class RocksDB
     end
   end
 
-  def delete_if?
+  def delete_if
     self.each do |k, v|
       self.delete(k) if yield(k, v)
     end
@@ -49,18 +49,22 @@ class RocksDB
   end
 
   def values_at(*keys)
-    array = self.flat_map do |k, v|
+    maybe_values = self.map do |k, v|
       if keys.include?(k)
-        [k]
+        v
       else
-        []
+        nil
       end
     end
 
-    if array.empty?
+    values = maybe_values.select do |v|
+      !v.nil?
+    end
+
+    if values.empty?
       nil
     else
-      array
+      values
     end
   end
 
@@ -88,4 +92,5 @@ class RocksDB
   alias length count
   alias size count
   alias value? has_value?
+  alias reject! delete_if
 end
